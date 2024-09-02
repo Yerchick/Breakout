@@ -23,7 +23,7 @@ void ABPO_GameMode::StartPlay()
 	GS.paddle.speed = PaddleSpeed;
 	GS.paddle.height = PaddleHeight;
 	GS.paddle.width = PaddleWidth;
-	GS.paddle.startPosition = Breakout::Position{ GridSize.X / 2 + PaddleWidth/2, DeadzoneHeight};
+	GS.paddle.startPosition = Breakout::Position{ GridSize.X / 2 + PaddleWidth/2, GridSize.Y + WallWidth + PaddleHeight -DeadzoneHeight};
 
 	Game = MakeUnique<Breakout::Game>(GS);
 	check(Game.IsValid());

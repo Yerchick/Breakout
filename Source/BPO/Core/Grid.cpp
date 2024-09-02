@@ -11,25 +11,30 @@ using namespace Breakout;
 
 Grid::Grid(const Breakout::Settings& settings) // Leave a space for walls and a field for a paddle and deadzone
 	: c_dim(Dim{
-		settings.grid.gridSize.width + settings.grid.wallWidth * 2 ,
-		settings.grid.gridSize.height + settings.grid.deadzoneHeight + settings.paddle.height + settings.grid.wallWidth
-		})
+			settings.grid.gridSize.width + settings.grid.wallWidth * 2 ,
+			settings.grid.gridSize.height + settings.grid.deadzoneHeight + settings.paddle.height + settings.grid.wallWidth
+		}),
+	deadZoneHeight(settings.grid.deadzoneHeight),
+	paddleZoneHeight(settings.paddle.height),
+	wallWidth(settings.grid.wallWidth)
 {
+	
 	m_cells.Init(CellType::Empty, c_dim.width * c_dim.height);
 	initWalls();
 	printDebug();
 }
 
 
+
 void Grid::initWalls()
 {
 	for (uint32 y = 0; y < c_dim.height; ++y) {
 		for (uint32 x = 0; x < c_dim.width; ++x) {
-			if (x == 0 || x == c_dim.width - 1 || y == 0) {
+			if (x <= wallWidth || x >= c_dim.width - wallWidth || y <= wallWidth) {
 				m_cells[posToIndex(x, y)] = CellType::Wall;
-			} else if (y == c_dim.height - 2) {
+			} else if (y >= c_dim.height - (paddleZoneHeight+deadZoneHeight) && y < c_dim.height - deadZoneHeight) {
 				m_cells[posToIndex(x, y)] = CellType::PaddleZone;
-			} else if (y == c_dim.height - 1) {
+			} else if (y >= c_dim.height - deadZoneHeight) {
 				m_cells[posToIndex(x, y)] = CellType::DeadZone;
 			}
 		}
@@ -39,6 +44,7 @@ void Grid::initWalls()
 void Grid::printDebug()
 {
 #if !UE_BUILD_SHIPPING
+	UE_LOG(LogGrid, Display, TEXT("/n/n") );
 	for (uint32 y = 0; y < c_dim.height; ++y) {
 		FString line;
 		for (uint32 x = 0; x < c_dim.width; ++x) {
@@ -46,8 +52,9 @@ void Grid::printDebug()
 			switch (m_cells[posToIndex(x, y)]) {
 
 				case CellType::Wall: symbol = '*'; break;
-				case CellType::PaddleZone: symbol = '-'; break;
+				case CellType::PaddleZone: symbol = '_'; break;
 				case CellType::DeadZone: symbol = 'x'; break;
+				case CellType::Paddle: symbol = '='; break;
 				default:
 				case CellType::Empty: symbol = '0'; break;
 					break;
@@ -59,9 +66,24 @@ void Grid::printDebug()
 #endif
 }
 
+void Grid::update(const TPositionPtr* links, CellType type)
+{
+	auto* link = links;
+	while (link) {
+		const auto index = posToIndex(link->GetValue());
+		m_cells[index] = type;
+		link = link->GetNextNode();
+	}
+}
+
+
+uint32 Grid::posToIndex(Position pos) const
+{
+	return posToIndex(pos.x, pos.y);
+}
+
 uint32 Grid::posToIndex(uint32 x, uint32 y) const
 {
 	return x + y * c_dim.width;
-
 }
 

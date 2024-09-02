@@ -20,7 +20,9 @@ enum class CellType
 	Block = 2,
 	SuperBlock = 3,
 	PaddleZone = 4,
-	DeadZone = 5
+	Paddle = 5,
+	DeadZone = 6,
+	Ball = 7
 };
 
 struct Position
@@ -53,9 +55,9 @@ struct Settings
 	struct PaddleParam
 	{
 		//Paddle(uint32 inWidth, uint32 inHeight, uint32 inSpeed, Position inStartPosition) : width(inWidth), height(inHeight), speed(inSpeed), startPosition(inStartPosition) {}
-		uint32 width{4};
-		uint32 height{1};
-		uint32 speed{ 10 };
+		uint8 width{4};
+		uint8 height{1};
+		uint8 speed{ 10 };
 		Position startPosition{ 0,0 };
 
 	} paddle;
@@ -65,4 +67,8 @@ struct Input
 {
 	int8 x;
 };
-}
+
+using TPaddleList = TDoubleLinkedList<Position>;
+using TPositionPtr = TPaddleList::TDoubleLinkedListNode;
+
+} //namespace breakout

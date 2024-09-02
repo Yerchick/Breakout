@@ -13,6 +13,9 @@ Game::Game(const Settings& settings) : c_settings(settings)
 {
 	m_grid = MakeShared<Grid>(settings);
 	m_paddle = MakeShared<Paddle>(settings);
+
+	m_grid->update(m_paddle->body(), CellType::Paddle);
+	m_grid->printDebug();
 }
 
 void Game::update(float deltaSeconds, const Input& input)

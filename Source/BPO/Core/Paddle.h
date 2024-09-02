@@ -13,5 +13,12 @@ public:
 	Paddle(const Settings& settings);
 
 	void move(const Input& input);
+	
+	const TPositionPtr* body() const { return m_links.GetHead()->GetNextNode(); }
+
+private:
+	TPaddleList m_links;
+
 };
+
 } //namespace Breakout
