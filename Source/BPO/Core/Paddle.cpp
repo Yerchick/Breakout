@@ -3,7 +3,17 @@
 
 #include "Core/Paddle.h"
 
-Paddle::Paddle()
+using namespace Breakout;
+
+Paddle::Paddle(const Settings& settings)
 {
+	for (uint32 i = 0; i < settings.paddle.width; ++i) {
+
+	}
+}
+
+void Paddle::move(const Input& input)
+{
+
 }
 

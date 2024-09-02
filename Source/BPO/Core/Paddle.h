@@ -3,11 +3,15 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "BPO_Types.h"
 
-
-class BPO_API Paddle
+namespace Breakout
+{
+class  Paddle
 {
 public:
-	Paddle();
+	Paddle(const Settings& settings);
 
+	void move(const Input& input);
 };
+} //namespace Breakout

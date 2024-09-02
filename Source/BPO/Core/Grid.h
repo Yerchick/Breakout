@@ -10,7 +10,7 @@ namespace Breakout {
 	class  Grid
 	{
 	public:
-		Grid(const Dim& dim);
+		Grid(const Breakout::Settings& settings);
 
 		Dim dim() const { return c_dim; }
 
