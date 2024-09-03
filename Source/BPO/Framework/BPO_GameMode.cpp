@@ -23,7 +23,7 @@ void ABPO_GameMode::StartPlay()
 	GS.paddle.speed = PaddleSpeed;
 	GS.paddle.height = PaddleHeight;
 	GS.paddle.width = PaddleWidth;
-	GS.paddle.startPosition = Breakout::Position{ GridSize.X / 2 + PaddleWidth/2, GridSize.Y + WallWidth + PaddleHeight -DeadzoneHeight};
+	GS.paddle.startPosition = Breakout::Position{ GridSize.X / 2 + PaddleWidth/2, GridSize.Y + WallWidth};
 
 	Game = MakeUnique<Breakout::Game>(GS);
 	check(Game.IsValid());
@@ -33,7 +33,7 @@ void ABPO_GameMode::StartPlay()
 	check(GetWorld());
 	GridVisual = GetWorld()->SpawnActorDeferred<ABPO_Grid>(GridVisualClass, GridOrigin);
 	check(GridVisual);
-	GridVisual->SetModel(Game->grid(), CellSize);
+	GridVisual->SetModel(Game->grid(), CellSize, WallWidth);
 	GridVisual->FinishSpawning(GridOrigin);
 
 	// set pawn location fitting grid in viewport

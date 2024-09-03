@@ -33,7 +33,7 @@ protected:
 
 public:
 	virtual void Tick(float DeltaTime) override;
-	void SetModel(const TSharedPtr<Breakout::Grid>& Grid, FUintPoint InCellSize);
+	void SetModel(const TSharedPtr<Breakout::Grid>& Grid, FUintPoint InCellSize, uint8 InWallThickness);
 
 private:
 	UPROPERTY()
@@ -42,6 +42,7 @@ private:
 	Breakout::Dim GridDim;
 	FUintPoint CellSize;
 	FUintPoint WorldSize;
+	uint8 WallThickness;
 
 	void DrawGrid();
 };

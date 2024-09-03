@@ -29,7 +29,7 @@ void ABPO_Grid::BeginPlay()
 }
 
 
-void ABPO_Grid::SetModel(const TSharedPtr<Breakout::Grid>& Grid, FUintPoint InCellSize)
+void ABPO_Grid::SetModel(const TSharedPtr<Breakout::Grid>& Grid, FUintPoint InCellSize, uint8 InWallThickness)
 {
 	if (!Grid.IsValid()) {
 		UE_LOG(LogWorldGrid, Fatal, TEXT("Grid is null, game aborted!"));
@@ -37,6 +37,7 @@ void ABPO_Grid::SetModel(const TSharedPtr<Breakout::Grid>& Grid, FUintPoint InCe
 	GridDim = Grid.Get()->dim();
 	CellSize = InCellSize;
 	WorldSize = FUintPoint((CellSize.X * GridDim.width), (CellSize.Y * GridDim.height));
+	WallThickness = InWallThickness;
 
 	UE_LOG(LogWorldGrid, Display, TEXT("Grid size: %d, %d, Cell Size: %d, %d, World Size: %d, %d"), GridDim.width, GridDim.height, CellSize.X, CellSize.Y, WorldSize.X, WorldSize.Y);
 
@@ -51,7 +52,7 @@ void ABPO_Grid::SetModel(const TSharedPtr<Breakout::Grid>& Grid, FUintPoint InCe
 	//setup material
 	GridMaterial = GridMesh->CreateAndSetMaterialInstanceDynamic(0);
 	if (GridMaterial) {
-		GridMaterial->SetVectorParameterValue("Division", FVector(GridDim.height, GridDim.width, 0.0));
+		GridMaterial->SetVectorParameterValue("Division", FVector(GridDim.height, GridDim.width, WallThickness));
 	}
 
 }

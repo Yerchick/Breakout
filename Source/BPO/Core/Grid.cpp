@@ -30,7 +30,7 @@ void Grid::initWalls()
 {
 	for (uint32 y = 0; y < c_dim.height; ++y) {
 		for (uint32 x = 0; x < c_dim.width; ++x) {
-			if (x <= wallWidth || x >= c_dim.width - wallWidth || y <= wallWidth) {
+			if (x < wallWidth || x >= c_dim.width - wallWidth || y < wallWidth) {
 				m_cells[posToIndex(x, y)] = CellType::Wall;
 			} else if (y >= c_dim.height - (paddleZoneHeight+deadZoneHeight) && y < c_dim.height - deadZoneHeight) {
 				m_cells[posToIndex(x, y)] = CellType::PaddleZone;
