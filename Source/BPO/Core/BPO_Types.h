@@ -25,11 +25,48 @@ enum class CellType
 	Ball = 7
 };
 
+inline const TCHAR* ToString(Breakout::CellType Type)
+{
+	switch (Type) {
+		case CellType::Empty:
+			return TEXT("Empty");
+		case CellType::Wall:
+			return TEXT("Wall");
+		case CellType::Block:
+			return TEXT("Block");
+		case CellType::SuperBlock:
+			return TEXT("SuperBlock");
+		case CellType::PaddleZone:
+			return TEXT("PaddleZone");
+		case CellType::Paddle:
+			return TEXT("Paddle");
+		case CellType::DeadZone:
+			return TEXT("DeadZone");
+		case CellType::Ball:
+			return TEXT("Ball");
+	}
+	return TEXT("Unknown");
+}
+
 struct Position
 {
 	Position(uint32 inX, uint32 inY) : x(inX), y(inY) {}
 	uint32 x;
 	uint32 y;
+
+	FORCEINLINE Position& operator +=(const Position& rhs)
+	{
+		x += rhs.x;
+		y += rhs.y;
+		return *this;
+	}
+
+	FORCEINLINE Position& operator+(const Position& rhs)
+	{
+		x += rhs.x;
+		y += rhs.y;
+		return *this;
+	}
 };
 
 
@@ -39,14 +76,10 @@ struct Position
 struct Settings
 {
 	uint8 difficulty = 1;
-
-	//	Grid grid { Dim{30, 50}, uint8(2), uint8(2)};
-
-	//	Paddle paddle {uint8( 4), uint8(1), uint8(100), Position{1,10} };
+	float gameSpeed = 1.0f;
 
 	struct Grid
 	{
-		//Grid(Dim inGridSize, uint8 inWallWidth, uint8 inDeadzoneHeight) : gridSize(inGridSize), wallWidth(inWallWidth), deadzoneHeight(inDeadzoneHeight) {}
 		Dim gridSize{ 5, 10 };
 		uint8 wallWidth{ 2 };
 		uint8 deadzoneHeight{ 1 };
@@ -54,18 +87,16 @@ struct Settings
 
 	struct PaddleParam
 	{
-		//Paddle(uint32 inWidth, uint32 inHeight, uint32 inSpeed, Position inStartPosition) : width(inWidth), height(inHeight), speed(inSpeed), startPosition(inStartPosition) {}
 		uint8 width{4};
 		uint8 height{1};
 		uint8 speed{ 10 };
 		Position startPosition{ 0,0 };
-
 	} paddle;
 };
 
 struct Input
 {
-	int8 x;
+	float x;
 };
 
 using TPaddleList = TDoubleLinkedList<Position>;

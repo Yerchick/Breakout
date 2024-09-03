@@ -14,17 +14,28 @@ class Ball;
 
 class Game
 {
-	public:
+public:
 	Game(const Settings& settings);
 	TSharedPtr<Grid> grid() const { return m_grid; };
+	TSharedPtr<Paddle> paddle() const { return m_paddle; };
 	void update(float deltaSeconds, const Input& input);
 
-	private: 
+private:
 	const Settings c_settings;
 	TSharedPtr<Grid> m_grid;
 	TSharedPtr<Paddle> m_paddle;
 	TSharedPtr<Ball> m_ball;
+
 	void movePaddle(const Input& input);
+	bool canPaddleMove(const Input& input);
+	void moveBall(const float deltaSeconds);
+	void updateGrid();
+
+	float m_movePaddleSeconds{0.0f};
+	bool isTimeToUpdate(float deltaSeconds);
+	bool m_gameOver = false;
+	bool m_gridChanged = false;
+
 };
 } //namespace Breakout
 

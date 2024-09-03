@@ -69,17 +69,17 @@ void ABPO_Pawn::OnViewportResized(FViewport* Viewport, uint32 Val)
 
 	double LocationZ = 0.0;
 	
-	if (AspectRatio >= GridAspect) {
+	if (AspectRatio <= GridAspect) {
 		//UE_LOG(LogTemp, Display, TEXT("Horizontal aspect is: %f"), GridAspect);
 		LocationZ = (WorldSize.X * 0.5)  / FOVTan(Camera->FieldOfView);
 		//LocationZ = (WorldSize.X * 0.5)  / FMath::Tan(FMath::DegreesToRadians((Camera->FieldOfView * 0.5) * AspectRatio));
 	
-		//UE_LOG(LogTemp, Display, TEXT("Horizontal aspect is: %f, CameraFOV: %f, AspectRatio: %f, LocationZ: %f"), GridAspect, Camera->FieldOfView, AspectRatio, LocationZ);
+		UE_LOG(LogTemp, Display, TEXT("Horizontal aspect is: %f, CameraFOV: %f, AspectRatio: %f, LocationZ: %f"), GridAspect, Camera->FieldOfView, AspectRatio, LocationZ);
 	} else {
 		
 		check(AspectRatio);
 		LocationZ = (WorldSize.Y * 0.5) / FOVTan(VerticalFOV(Camera->FieldOfView, AspectRatio));
-		//UE_LOG(LogTemp, Display, TEXT("Vertical aspect is: %f, CameraFOV: %f, AspectRatio: %f, LocationZ: %f"), GridAspect, Camera->FieldOfView, AspectRatio, LocationZ);
+		UE_LOG(LogTemp, Display, TEXT("Vertical aspect is: %f, CameraFOV: %f, AspectRatio: %f, LocationZ: %f"), GridAspect, Camera->FieldOfView, AspectRatio, LocationZ);
 	}
 	
 	const FVector NewPawnLocation = GridOrigin.GetLocation() +  FVector(WorldSize.Y * 0.5, WorldSize.X * 0.5, LocationZ);

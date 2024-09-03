@@ -13,7 +13,8 @@ namespace Breakout {
 		Grid(const Breakout::Settings& settings);
 
 		Dim dim() const { return c_dim; }
-		void update(const TPositionPtr* links, CellType type);
+		void update(const TPositionPtr* links, CellType type, bool debug = false);
+		bool hitTest(const Position& pos, CellType cellType) const;
 		void printDebug();
 
 	private:
@@ -25,10 +26,9 @@ namespace Breakout {
 
 		void initWalls();
 
-		
-
 		FORCEINLINE uint32 posToIndex(uint32 x, uint32 y) const;
-		FORCEINLINE uint32 posToIndex(Position pos) const;
+		FORCEINLINE uint32 posToIndex(const Position& pos) const;
+		void freeCellsByType(CellType type);
 	};
 
 

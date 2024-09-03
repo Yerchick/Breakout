@@ -31,10 +31,10 @@ void ABPO_Grid::BeginPlay()
 
 void ABPO_Grid::SetModel(const TSharedPtr<Breakout::Grid>& Grid, FUintPoint InCellSize, uint8 InWallThickness)
 {
-	if (!Grid.IsValid()) {
+	if (!Grid) {
 		UE_LOG(LogWorldGrid, Fatal, TEXT("Grid is null, game aborted!"));
 	}
-	GridDim = Grid.Get()->dim();
+	GridDim = Grid->dim();
 	CellSize = InCellSize;
 	WorldSize = FUintPoint((CellSize.X * GridDim.width), (CellSize.Y * GridDim.height));
 	WallThickness = InWallThickness;
