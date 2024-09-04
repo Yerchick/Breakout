@@ -7,6 +7,9 @@
 #include "BPO/Core/Paddle.h"
 #include "BPO_Paddle.generated.h"
 
+
+class ABPO_PaddleLink;
+
 UCLASS()
 class BPO_API ABPO_Paddle : public AActor
 {
@@ -15,20 +18,20 @@ class BPO_API ABPO_Paddle : public AActor
 public:	
 	ABPO_Paddle();
 
-	void SetModel(const TSharedPtr<Breakout::Paddle>& InPaddle, FUintPoint InCellSize, FUintPoint InPaddlelSize, const Breakout::Dim& InDims);
+	void SetModel(const TSharedPtr<Breakout::Paddle>& InPaddle, uint32 InCellSize, FUintPoint InPaddlelSize, const Breakout::Dim& InDims);
 
 protected:
 	virtual void BeginPlay() override;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	TSubclassOf<AActor> PaddleClass;
+	TSubclassOf<ABPO_PaddleLink> PaddleClass;
 
 public:	
 	virtual void Tick(float DeltaTime) override;
 
 private:
 	TWeakPtr<Breakout::Paddle> Paddle;
-	FUintPoint CellSize;
+	uint32 CellSize;
 	FUintPoint PaddleSize;
 	Breakout::Dim Dims;
 

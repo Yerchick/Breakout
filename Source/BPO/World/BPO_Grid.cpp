@@ -29,17 +29,17 @@ void ABPO_Grid::BeginPlay()
 }
 
 
-void ABPO_Grid::SetModel(const TSharedPtr<Breakout::Grid>& Grid, FUintPoint InCellSize, uint8 InWallThickness)
+void ABPO_Grid::SetModel(const TSharedPtr<Breakout::Grid>& Grid, uint32 InCellSize, uint8 InWallThickness)
 {
 	if (!Grid) {
 		UE_LOG(LogWorldGrid, Fatal, TEXT("Grid is null, game aborted!"));
 	}
 	GridDim = Grid->dim();
 	CellSize = InCellSize;
-	WorldSize = FUintPoint((CellSize.X * GridDim.width), (CellSize.Y * GridDim.height));
+	WorldSize = FUintPoint((CellSize * GridDim.width), (CellSize * GridDim.height));
 	WallThickness = InWallThickness;
 
-	UE_LOG(LogWorldGrid, Display, TEXT("Grid size: %d, %d, Cell Size: %d, %d, World Size: %d, %d"), GridDim.width, GridDim.height, CellSize.X, CellSize.Y, WorldSize.X, WorldSize.Y);
+	UE_LOG(LogWorldGrid, Display, TEXT("Grid size: %d, %d, Cell Size: %d, World Size: %d, %d"), GridDim.width, GridDim.height, CellSize, WorldSize.X, WorldSize.Y);
 
 	//scale mesh
 	check(GridMesh->GetStaticMesh());
@@ -66,13 +66,13 @@ void ABPO_Grid::Tick(float DeltaTime)
 void ABPO_Grid::DrawGrid()
 {
 	for (uint32 i = 0; i < GridDim.height + 1; ++i) {
-		const FVector StartLocation = GetActorLocation() + GetActorForwardVector() * CellSize.Y * i;
+		const FVector StartLocation = GetActorLocation() + GetActorForwardVector() * CellSize * i;
 		const FVector EndLocation = StartLocation + GetActorRightVector() * WorldSize.X;
 		//DrawDebugLine(GetWorld(), StartLocation, StartLocation + GetActorRightVector() * WorldWidth, FColor::Red, false, -1.0f);
 		GetWorld()->LineBatcher->DrawLine( StartLocation, EndLocation, FColor::Red, 1, -1.0f);
 	}
 	for (uint32 i = 0; i < GridDim.width + 1; ++i) {
-		const FVector StartLocation = GetActorLocation() + GetActorRightVector() * CellSize.X * i;
+		const FVector StartLocation = GetActorLocation() + GetActorRightVector() * CellSize * i;
 		const FVector EndLocation = StartLocation + GetActorForwardVector() * WorldSize.Y;
 		DrawDebugLine(GetWorld(), StartLocation, EndLocation, FColor::Red, false, -1.0f);
 		GetWorld()->LineBatcher->DrawLine(StartLocation, EndLocation, FColor::Green, 1, -1.0f);

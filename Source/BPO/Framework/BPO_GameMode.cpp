@@ -7,6 +7,7 @@
 #include "BPO/Core/Grid.h"
 #include "World/BPO_Grid.h"
 #include "World/BPO_Paddle.h"
+#include "World/BPO_Ball.h"
 #include "Framework/BPO_Pawn.h"
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
@@ -23,18 +24,7 @@ void ABPO_GameMode::StartPlay()
 	Super::StartPlay();
 
 	// ini core game
-	Breakout::Settings GS;
-	GS.difficulty = Difficulty;
-	GS.gameSpeed = GameSpeed;
-	GS.grid.gridSize = Breakout::Dim{ GridSize.X, GridSize.Y };
-	GS.grid.wallWidth = WallWidth;
-	GS.grid.deadzoneHeight = DeadzoneHeight;
-	GS.paddle.speed = PaddleSpeed;
-	GS.paddle.height = PaddleHeight;
-	GS.paddle.width = PaddleWidth;
-	GS.paddle.startPosition = Breakout::Position{ GridSize.X / 2 + PaddleWidth / 2, GridSize.Y + WallWidth };
-
-	Game = MakeUnique<Breakout::Game>(GS);
+	Game = MakeUnique<Breakout::Game>(MakeSettings());
 	check(Game.IsValid());
 
 	// init world grid
@@ -49,6 +39,11 @@ void ABPO_GameMode::StartPlay()
 	PaddleVisual = GetWorld()->SpawnActorDeferred<ABPO_Paddle>(PaddleVisualClass, GridOrigin);
 	PaddleVisual->SetModel(Game->paddle(), CellSize, FUintPoint{ PaddleWidth , PaddleHeight }, Game->grid()->dim());
 	PaddleVisual->FinishSpawning(GridOrigin);
+
+	//init world ball
+	BallVisual = GetWorld()->SpawnActorDeferred<ABPO_Ball>(BallVisualClass, GridOrigin);
+	BallVisual->SetModel(Game->ball(), CellSize, Game->grid()->dim());
+	BallVisual->FinishSpawning(GridOrigin);
 
 	// set pawn location fitting grid in viewport
 	auto* PC = GetWorld()->GetFirstPlayerController();
@@ -78,19 +73,55 @@ void ABPO_GameMode::SetupInput()
 
 	if (auto* PC = Cast<APlayerController>(GetWorld()->GetFirstPlayerController())) {
 		if (auto* InputSystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PC->GetLocalPlayer())) {
-			InputSystem->AddMappingContext(InputMapping, 0);
+			InputSystem->AddMappingContext(InputPaddleMapping, 0);
+			InputSystem->AddMappingContext(InputGameMapping, 0);
 		}
 
 		auto* Input = Cast<UEnhancedInputComponent>(PC->InputComponent);
 		check(Input);
 		Input->BindAction(MoveRight, ETriggerEvent::Triggered, this, &ThisClass::OnMoveRight);
+		Input->BindAction(SpeedUp, ETriggerEvent::Triggered, this, &ThisClass::OnSpeedUp);
 	}
 }
 
 void ABPO_GameMode::OnMoveRight(const FInputActionValue& Value)
 {
 	float inputValue = FMath::Clamp(Value.Get<float>(), -1, 1);
-	UE_LOG(LogTemp, Display, TEXT("OnMoveRight received input: %f"), inputValue);
 	PaddleInput = Breakout::Input(inputValue);
-	
+
+}
+
+void ABPO_GameMode::OnSpeedUp(const FInputActionValue& Value)
+{
+	const bool inputValue = Value.Get<bool>();
+	//	PaddleInput = Breakout::Input(inputValue);
+	check(Game.IsValid());
+	Game.Get()->updateGameSpeed(inputValue ? GameSpeed * 5: GameSpeed);
+}
+
+void ABPO_GameMode::OnRestart(const FInputActionValue& Value)
+{
+	if (const bool inputValue = Value.Get<bool>()) {
+		Game.Reset(new Breakout::Game(MakeSettings()));
+		check(Game.IsValid());
+		GridVisual->SetModel(Game->grid(), CellSize, WallWidth);
+		PaddleVisual->SetModel(Game->paddle(), CellSize, FUintPoint{ PaddleWidth , PaddleHeight }, Game->grid()->dim());
+		BallVisual->SetModel(Game->ball(), CellSize, Game->grid()->dim());
+	}
+}
+
+Breakout::Settings ABPO_GameMode::MakeSettings()
+{
+	Breakout::Settings GS;
+	GS.difficulty = Difficulty;
+	GS.gameSpeed = GameSpeed;
+	GS.ballSpeed = BallSpeed;
+	GS.grid.gridSize = Breakout::Dim{ GridSize.X, GridSize.Y };
+	GS.grid.wallWidth = WallWidth;
+	GS.grid.deadzoneHeight = DeadzoneHeight;
+	GS.paddle.speed = PaddleSpeed;
+	GS.paddle.height = PaddleHeight;
+	GS.paddle.width = PaddleWidth;
+	GS.paddle.startPosition = Breakout::Position{ (GridSize.X+ WallWidth) / 2 + PaddleWidth / 2, GridSize.Y + WallWidth };
+	return GS;
 }

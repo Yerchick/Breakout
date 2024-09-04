@@ -2,6 +2,7 @@
 
 
 #include "World/BPO_Paddle.h"
+#include "World/BPO_PaddleLink.h"
 
 namespace
 {
@@ -17,7 +18,7 @@ ABPO_Paddle::ABPO_Paddle()
 
 }
 
-void ABPO_Paddle::SetModel(const TSharedPtr<Breakout::Paddle>& InPaddle, FUintPoint InCellSize, FUintPoint InPaddlelSize, const Breakout::Dim& InDims)
+void ABPO_Paddle::SetModel(const TSharedPtr<Breakout::Paddle>& InPaddle, uint32 InCellSize, FUintPoint InPaddlelSize, const Breakout::Dim& InDims)
 {
 	Paddle = InPaddle;
 	CellSize = InCellSize;
@@ -37,7 +38,9 @@ void ABPO_Paddle::BeginPlay()
 	uint32 i = 0;
 	for (const auto& Link : Links) {
 		const FTransform Transform = FTransform(LinkPositionToVector(Link, CellSize, Dims));
-		auto* LinkActor = GetWorld()->SpawnActor<AActor>(PaddleClass, Transform);
+		auto* LinkActor = GetWorld()->SpawnActorDeferred<ABPO_PaddleLink>(PaddleClass, Transform);
+		LinkActor->UpdateScale(CellSize, PaddleSize);
+		LinkActor->FinishSpawning(Transform);
 		PaddleLinks.Add(LinkActor);
 		++i;
 	}

@@ -11,6 +11,7 @@
 
 class ABPO_Grid;
 class ABPO_Paddle;
+class ABPO_Ball;
 class UInputAction;
 class UInputMappingContext;
 
@@ -36,7 +37,7 @@ protected:
 	FUintPoint GridSize{ 30, 50 };
 
 	UPROPERTY(EditDefaultsOnly, meta = (ClampMin = "2", ClampMax = "100"), Category = "Grid Settings")
-	FUintPoint CellSize{ 10, 10 };
+	uint32 CellSize{ 10 };
 
 	UPROPERTY(EditDefaultsOnly, meta = (ClampMin = "1", ClampMax = "10"), Category = "Grid Settings")
 	uint8 WallWidth{ 1 };
@@ -47,8 +48,8 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Paddle Settings")
 	TSubclassOf<ABPO_Paddle> PaddleVisualClass;
 
-	UPROPERTY(EditDefaultsOnly, meta = (ClampMin = "1", ClampMax = "200"), Category = "Paddle Settings")
-	uint32 PaddleSpeed{ 10 };
+	UPROPERTY(EditDefaultsOnly, meta = (ClampMin = "0.01", ClampMax = "10"), Category = "Paddle Settings")
+	float PaddleSpeed{ 1.0f };
 
 	UPROPERTY(EditDefaultsOnly, meta = (ClampMin = "2", ClampMax = "20"), Category = "Paddle Settings")
 	uint8 PaddleWidth{ 4 };
@@ -62,11 +63,26 @@ protected:
 	UPROPERTY(EditDefaultsOnly, meta = (ClampMin = "0.01", ClampMax = "10.0"), Category = "Game Settings")
 	float GameSpeed{ 0.5f };
 
+	UPROPERTY(EditDefaultsOnly, Category = "Ball Settings")
+	TSubclassOf<ABPO_Ball> BallVisualClass;
+
+	UPROPERTY(EditDefaultsOnly, meta = (ClampMin = "10", ClampMax = "1000.0"), Category = "Ball Settings")
+	float BallSpeed{ 200 };
+
 	UPROPERTY(EditDefaultsOnly, Category = "Input Settings")
 	TObjectPtr<UInputAction> MoveRight;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Input Settings")
-	TObjectPtr <UInputMappingContext> InputMapping;
+	TObjectPtr<UInputAction> SpeedUp;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Input Settings")
+	TObjectPtr<UInputAction> Restart;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Input Settings")
+	TObjectPtr <UInputMappingContext> InputPaddleMapping;	
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Input Settings")
+	TObjectPtr <UInputMappingContext> InputGameMapping;
 
 private:
 	TUniquePtr<Breakout::Game> Game;
@@ -78,6 +94,13 @@ private:
 	UPROPERTY()
 	ABPO_Paddle* PaddleVisual;
 
+	UPROPERTY()
+	ABPO_Ball* BallVisual;
+
 	void SetupInput();
 	void OnMoveRight(const FInputActionValue& Value);
+	void OnSpeedUp(const FInputActionValue& Value);
+	void OnRestart(const FInputActionValue& Value);
+
+	Breakout::Settings MakeSettings();
 };

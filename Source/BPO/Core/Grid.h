@@ -15,6 +15,7 @@ namespace Breakout {
 		Dim dim() const { return c_dim; }
 		void update(const TPositionPtr* links, CellType type, bool debug = false);
 		bool hitTest(const Position& pos, CellType cellType) const;
+		CellType hitResult(const Position& pos) const;
 		void printDebug();
 
 	private:

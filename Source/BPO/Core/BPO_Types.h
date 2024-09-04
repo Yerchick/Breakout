@@ -22,7 +22,8 @@ enum class CellType
 	PaddleZone = 4,
 	Paddle = 5,
 	DeadZone = 6,
-	Ball = 7
+	Ball = 7,
+	Error = 8
 };
 
 inline const TCHAR* ToString(Breakout::CellType Type)
@@ -44,6 +45,8 @@ inline const TCHAR* ToString(Breakout::CellType Type)
 			return TEXT("DeadZone");
 		case CellType::Ball:
 			return TEXT("Ball");
+		case CellType::Error:
+			return TEXT("Error");
 	}
 	return TEXT("Unknown");
 }
@@ -51,6 +54,7 @@ inline const TCHAR* ToString(Breakout::CellType Type)
 struct Position
 {
 	Position(uint32 inX, uint32 inY) : x(inX), y(inY) {}
+	Position(FVector2D vector) : x(vector.X), y(vector.Y) {}
 	uint32 x;
 	uint32 y;
 
@@ -67,16 +71,21 @@ struct Position
 		y += rhs.y;
 		return *this;
 	}
+
+	FORCEINLINE bool operator!=(const Position& rhs)
+	{
+		bool xEqual = (x != rhs.x);
+		bool yEqual = (y != rhs.y);
+		return (xEqual || yEqual);
+	}
 };
-
-
-
 
 
 struct Settings
 {
 	uint8 difficulty = 1;
 	float gameSpeed = 1.0f;
+	float ballSpeed = 10;
 
 	struct Grid
 	{
@@ -99,7 +108,7 @@ struct Input
 	float x;
 };
 
-using TPaddleList = TDoubleLinkedList<Position>;
-using TPositionPtr = TPaddleList::TDoubleLinkedListNode;
+using TPositionList = TDoubleLinkedList<Position>;
+using TPositionPtr = TPositionList::TDoubleLinkedListNode;
 
 } //namespace breakout
