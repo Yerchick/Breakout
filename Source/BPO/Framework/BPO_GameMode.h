@@ -12,6 +12,7 @@
 class ABPO_Grid;
 class ABPO_Paddle;
 class ABPO_Ball;
+class ABPO_Block;
 class UInputAction;
 class UInputMappingContext;
 
@@ -31,7 +32,8 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Grid Settings")
 	TSubclassOf<ABPO_Grid> GridVisualClass;
 
-
+	UPROPERTY(EditDefaultsOnly, Category = "Paddle Settings")
+	TSubclassOf<ABPO_Block> BlockVisualClass;
 
 	UPROPERTY(EditDefaultsOnly, meta = (ClampMin = "5", ClampMax = "200"), Category = "Grid Settings")
 	FUintPoint GridSize{ 30, 50 };
@@ -44,6 +46,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, meta = (ClampMin = "1", ClampMax = "10"), Category = "Grid Settings")
 	uint8 DeadzoneHeight{ 1 };
+
+	UPROPERTY(EditDefaultsOnly, meta = (ClampMin = "5", ClampMax = "200"), Category = "Grid Settings")
+	FUintPoint BlockSize{ 30, 50 };
 
 	UPROPERTY(EditDefaultsOnly, Category = "Paddle Settings")
 	TSubclassOf<ABPO_Paddle> PaddleVisualClass;
@@ -96,6 +101,9 @@ private:
 
 	UPROPERTY()
 	ABPO_Ball* BallVisual;
+
+	UPROPERTY()
+	TArray<ABPO_Block*> BlocksVisual;
 
 	void SetupInput();
 	void OnMoveRight(const FInputActionValue& Value);

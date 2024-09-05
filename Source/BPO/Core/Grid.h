@@ -7,6 +7,8 @@
 
 namespace Breakout {
 
+class Block;
+
 	class  Grid
 	{
 	public:
@@ -14,11 +16,17 @@ namespace Breakout {
 
 		Dim dim() const { return c_dim; }
 		void update(const TPositionPtr* links, CellType type, bool debug = false);
+		void update(const TArray<TSharedPtr<Block>> blocks, CellType cellType);
+		void update(const Position& pos, CellType cellType);
 		bool hitTest(const Position& pos, CellType cellType) const;
-		CellType hitResult(const Position& pos) const;
+		HitResult hitResult(const Position& pos) const;
+		CellType hitCellType(const Position& pos) const;
+		FUintRect getFreeSpace() const { return freeSpace; }
 		void printDebug();
 
 	private:
+
+		FUintRect freeSpace;
 		const uint8 deadZoneHeight;
 		const uint8 paddleZoneHeight;
 		const uint8 wallWidth;

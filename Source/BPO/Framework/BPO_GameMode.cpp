@@ -8,6 +8,7 @@
 #include "World/BPO_Grid.h"
 #include "World/BPO_Paddle.h"
 #include "World/BPO_Ball.h"
+#include "World/BPO_Block.h"
 #include "Framework/BPO_Pawn.h"
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
@@ -34,6 +35,16 @@ void ABPO_GameMode::StartPlay()
 	check(GridVisual);
 	GridVisual->SetModel(Game->grid(), CellSize, WallWidth);
 	GridVisual->FinishSpawning(GridOrigin);
+
+	//init world blocks
+	auto blocks = Game->blocks();
+	for (int i = 0; i < blocks.Num(); ++i) {
+		auto newBlock = GetWorld()->SpawnActorDeferred<ABPO_Block>(BlockVisualClass, GridOrigin);
+		auto model = blocks[i];
+		newBlock->SetModel(model, CellSize, BlockSize, Game->grid()->dim());
+		newBlock->FinishSpawning(GridOrigin);
+		BlocksVisual.Add(newBlock);
+	}
 
 	//init world paddle
 	PaddleVisual = GetWorld()->SpawnActorDeferred<ABPO_Paddle>(PaddleVisualClass, GridOrigin);
@@ -115,6 +126,8 @@ Breakout::Settings ABPO_GameMode::MakeSettings()
 	Breakout::Settings GS;
 	GS.difficulty = Difficulty;
 	GS.gameSpeed = GameSpeed;
+	GS.grid.cellSize = CellSize;
+	GS.grid.blockSize = BlockSize;
 	GS.ballSpeed = BallSpeed;
 	GS.grid.gridSize = Breakout::Dim{ GridSize.X, GridSize.Y };
 	GS.grid.wallWidth = WallWidth;

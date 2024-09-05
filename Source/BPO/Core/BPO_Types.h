@@ -26,6 +26,28 @@ enum class CellType
 	Error = 8
 };
 
+enum class HitResult
+{
+	Success = 0,
+	Changes = 1,
+	Fault = 2
+};
+
+inline const TCHAR* ToString(Breakout::HitResult Type)
+{
+	switch (Type) {
+		case HitResult::Success:
+			return TEXT("Success");
+		case HitResult::Changes:
+			return TEXT("Changes");
+		case HitResult::Fault:
+			return TEXT("Fault");
+		default:
+
+			return TEXT("Unknown");
+	}
+}
+
 inline const TCHAR* ToString(Breakout::CellType Type)
 {
 	switch (Type) {
@@ -54,7 +76,7 @@ inline const TCHAR* ToString(Breakout::CellType Type)
 struct Position
 {
 	Position(uint32 inX, uint32 inY) : x(inX), y(inY) {}
-	Position(FVector2D vector) : x(vector.X), y(vector.Y) {}
+	Position(FVector2D vector) : x(vector.X+0.5), y(vector.Y+0.5) {}
 	uint32 x;
 	uint32 y;
 
@@ -70,6 +92,13 @@ struct Position
 		x += rhs.x;
 		y += rhs.y;
 		return *this;
+	}
+
+	FORCEINLINE bool operator==(const Position& rhs)
+	{
+		bool xEqual = (x == rhs.x);
+		bool yEqual = (y == rhs.y);
+		return (xEqual && yEqual);
 	}
 
 	FORCEINLINE bool operator!=(const Position& rhs)
@@ -90,8 +119,10 @@ struct Settings
 	struct Grid
 	{
 		Dim gridSize{ 5, 10 };
+		float cellSize{ 10 };
 		uint8 wallWidth{ 2 };
 		uint8 deadzoneHeight{ 1 };
+		FUintPoint blockSize{ 2, 1 };
 	} grid;
 
 	struct PaddleParam
