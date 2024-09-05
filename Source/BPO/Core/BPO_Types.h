@@ -28,15 +28,23 @@ enum class CellType
 
 enum class HitResult
 {
-	Success = 0,
+	NoHit = 0,
 	Changes = 1,
 	Fault = 2
+};
+
+enum class Dirrection
+{
+	Right = 0,
+	Left = 1,
+	Up = 2,
+	Down = 3
 };
 
 inline const TCHAR* ToString(Breakout::HitResult Type)
 {
 	switch (Type) {
-		case HitResult::Success:
+		case HitResult::NoHit:
 			return TEXT("Success");
 		case HitResult::Changes:
 			return TEXT("Changes");
@@ -137,6 +145,15 @@ struct Settings
 struct Input
 {
 	float x;
+};
+
+struct IntersectionResult
+{
+	HitResult result{ HitResult::Fault };
+	Position pos{ 0,0 };
+	CellType type{CellType::Error};
+	Dirrection dirr{ Dirrection::Right };
+
 };
 
 using TPositionList = TDoubleLinkedList<Position>;

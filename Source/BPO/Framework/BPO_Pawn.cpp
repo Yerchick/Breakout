@@ -12,7 +12,7 @@ float FOVTan(float FOVDegrees)
 }
 float VerticalFOV(float HorizontalFOVDegrees, float AspectRatio)
 {
-	return FMath::RadiansToDegrees(2.0f * FMath::Atan(FMath::Tan(FMath::DegreesToRadians(HorizontalFOVDegrees) * 0.5) * AspectRatio));
+	return FMath::RadiansToDegrees(2.0f * FMath::Atan(FMath::Tan(FMath::DegreesToRadians(HorizontalFOVDegrees * 0.5) * AspectRatio)));
 }
 }
 
@@ -63,26 +63,37 @@ void ABPO_Pawn::OnViewportResized(FViewport* Viewport, uint32 Val)
 	const double ViewWidth = Viewport->GetSizeXY().X;
 
 
-	const double AspectRatio = 1 / (static_cast<double>((ViewWidth) / (ViewHeight)));
+	const double AspectRatio = 1 / (ViewHeight / ViewWidth);
 	const double GridAspect = static_cast<double>(WorldWidth) / WorldHeight;
 
 
 	double LocationZ = 0.0;
 	
-	if (AspectRatio <= GridAspect) {
+	if (AspectRatio < GridAspect) {
 		//UE_LOG(LogTemp, Display, TEXT("Horizontal aspect is: %f"), GridAspect);
-		LocationZ = (WorldSize.X * 0.5)  / FOVTan(Camera->FieldOfView);
+		//LocationZ =  (WorldWidth)  / FOVTan(Camera->FieldOfView);
 		//LocationZ = (WorldSize.X * 0.5)  / FMath::Tan(FMath::DegreesToRadians((Camera->FieldOfView * 0.5) * AspectRatio));
+
+		//float tan = FMath::Tan(FMath::DegreesToRadians((Camera->FieldOfView * 0.5)));
+		float tan = FOVTan(Camera->FieldOfView);
+		LocationZ = (WorldWidth * ViewHeight) / ( tan * ViewWidth);
+		
 	
-		UE_LOG(LogTemp, Display, TEXT("Horizontal aspect is: %f, CameraFOV: %f, AspectRatio: %f, LocationZ: %f"), GridAspect, Camera->FieldOfView, AspectRatio, LocationZ);
+		UE_LOG(LogTemp, Display, TEXT("Horizontal aspect is: %f, AspectRatio: %f, LocationZ: %f, WorldSize: %d "), GridAspect, AspectRatio, LocationZ, WorldSize.X );
 	} else {
 		
 		check(AspectRatio);
-		LocationZ = (WorldSize.Y * 0.5) / FOVTan(VerticalFOV(Camera->FieldOfView, AspectRatio));
-		UE_LOG(LogTemp, Display, TEXT("Vertical aspect is: %f, CameraFOV: %f, AspectRatio: %f, LocationZ: %f"), GridAspect, Camera->FieldOfView, AspectRatio, LocationZ);
+		const float  tan = FOVTan(Camera->FieldOfView);
+		const float FOV = VerticalFOV(Camera->FieldOfView, ViewHeight / ViewWidth);
+		const float FovTan = FOVTan(FOV);
+		LocationZ = (WorldHeight* WorldHeight) / (tan * tan * ViewHeight*0.5);
+		//float tan = FMath::Tan(FMath::DegreesToRadians((Camera->FieldOfView * 0.5)));
+		//LocationZ = (WorldHeight * ViewHeight) / (tan * ViewWidth);
+
+		UE_LOG(LogTemp, Display, TEXT("Vertical aspect is: %f, AspectRatio: %f, LocationZ: %f, WorldSize: %d, fovTan: %f, viewH: %f "), GridAspect, AspectRatio, LocationZ, WorldSize.Y, FovTan, ViewHeight);
 	}
 	
-	const FVector NewPawnLocation = GridOrigin.GetLocation() +  FVector(WorldSize.Y * 0.5, WorldSize.X * 0.5, LocationZ);
+	const FVector NewPawnLocation = GridOrigin.GetLocation() +  FVector(WorldHeight * 0.5, WorldWidth * 0.5, LocationZ);
 	SetActorLocation(NewPawnLocation);
 }
 

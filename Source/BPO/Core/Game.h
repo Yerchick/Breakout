@@ -36,8 +36,12 @@ private:
 	void moveBall(const float deltaSeconds, const float ballSpeed);
 	void updateGrid();
 	void onBlockHit(const Position& pos);
-
-	FVector2D getDirrectionAfterHit(FVector2D pos, FVector2D oldPos, FVector2D dirrection);
+	//TArray<Breakout::Position> getAllIntersectingPositions(FVector2D atPoint, float radius, CellType cellType);
+	//Breakout::Position getNearestIntersectionPoint(FVector2D atPoint, TArray<Breakout::Position> positions);
+	TArray<Breakout::IntersectionResult> getAllIntersectingResults(FVector2D atPoint, float radius);
+	Breakout::IntersectionResult getNearestIntersectionResult(FVector2D atPoint, TArray<Breakout::IntersectionResult> results);
+	void UpdateDirrectionAfterHit(Breakout::IntersectionResult hit, FVector2D& dirrection);
+	//FVector2D getDirrectionAfterHit(FVector2D pos, FVector2D oldPos, FVector2D dirrection);
 
 	//FUintRect freeGamingSpace;
 	float m_movePaddleSeconds{0.0f};

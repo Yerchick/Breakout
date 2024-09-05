@@ -168,14 +168,14 @@ HitResult Grid::hitResult(const Position& pos) const
 	} else {
 		switch (m_cells[index]) {
 			case CellType::Wall: return HitResult::Changes;
-			case CellType::PaddleZone: return HitResult::Success;
+			case CellType::PaddleZone: return HitResult::NoHit;
 			case CellType::DeadZone: return HitResult::Fault;
 			case CellType::Paddle:  return HitResult::Changes;
 			case CellType::Block:  return HitResult::Changes;
 			case CellType::SuperBlock:  return HitResult::Changes;
 			case CellType::Ball: return HitResult::Changes;
 			default:
-			case CellType::Empty: return HitResult::Success;
+			case CellType::Empty: return HitResult::NoHit;
 				break;
 		}
 	}
