@@ -106,6 +106,7 @@ private:
 	TArray<ABPO_Block*> BlocksVisual;
 
 	void SetupInput();
+	void InitWorldBlocks();
 	void OnMoveRight(const FInputActionValue& Value);
 	void OnSpeedUp(const FInputActionValue& Value);
 	void OnRestart(const FInputActionValue& Value);

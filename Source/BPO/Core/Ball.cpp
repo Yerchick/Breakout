@@ -10,7 +10,7 @@ using namespace Breakout;
 
 Ball::Ball(const Settings& settings)
 {
-	m_positionAccurate = FVector2D(settings.paddle.startPosition.x, settings.paddle.startPosition.y - 1);
+	m_positionAccurate = FVector2D(settings.paddle.startPosition.x, settings.paddle.startPosition.y - 2);
 	m_position = getRoundedPosition(m_positionAccurate);
 	m_link.AddHead(m_position);
 }
@@ -32,7 +32,8 @@ void Ball::move(Position newPosition, FVector2D preciseLocation)
 
 const Position Ball::getRoundedPosition(FVector2D inPos)
 {
-	return Position((uint32)inPos.X + 0.5, (uint32)inPos.Y + 0.5);
+	//UE_LOG(LogBall, Display, TEXT("getRoundedPosition: %d, %d, from: %s"), (uint32)(inPos.X + 0.5), (uint32)(inPos.Y + 0.5), *inPos.ToString());
+	return Position((uint32)(inPos.X + 0.5), (uint32)(inPos.Y + 0.5));
 }
 
 

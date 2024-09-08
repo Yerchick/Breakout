@@ -36,15 +36,7 @@ void ABPO_GameMode::StartPlay()
 	GridVisual->SetModel(Game->grid(), CellSize, WallWidth);
 	GridVisual->FinishSpawning(GridOrigin);
 
-	//init world blocks
-	auto blocks = Game->blocks();
-	for (int i = 0; i < blocks.Num(); ++i) {
-		auto newBlock = GetWorld()->SpawnActorDeferred<ABPO_Block>(BlockVisualClass, GridOrigin);
-		auto model = blocks[i];
-		newBlock->SetModel(model, CellSize, BlockSize, Game->grid()->dim());
-		newBlock->FinishSpawning(GridOrigin);
-		BlocksVisual.Add(newBlock);
-	}
+	InitWorldBlocks();
 
 	//init world paddle
 	PaddleVisual = GetWorld()->SpawnActorDeferred<ABPO_Paddle>(PaddleVisualClass, GridOrigin);
@@ -92,6 +84,7 @@ void ABPO_GameMode::SetupInput()
 		check(Input);
 		Input->BindAction(MoveRight, ETriggerEvent::Triggered, this, &ThisClass::OnMoveRight);
 		Input->BindAction(SpeedUp, ETriggerEvent::Triggered, this, &ThisClass::OnSpeedUp);
+		Input->BindAction(Restart, ETriggerEvent::Triggered, this, &ThisClass::OnRestart);
 	}
 }
 
@@ -116,8 +109,22 @@ void ABPO_GameMode::OnRestart(const FInputActionValue& Value)
 		Game.Reset(new Breakout::Game(MakeSettings()));
 		check(Game.IsValid());
 		GridVisual->SetModel(Game->grid(), CellSize, WallWidth);
+		InitWorldBlocks();
 		PaddleVisual->SetModel(Game->paddle(), CellSize, FUintPoint{ PaddleWidth , PaddleHeight }, Game->grid()->dim());
 		BallVisual->SetModel(Game->ball(), CellSize, Game->grid()->dim());
+	}
+}
+
+void ABPO_GameMode::InitWorldBlocks()
+{
+	//init world blocks
+	auto blocks = Game->blocks();
+	for (int i = 0; i < blocks.Num(); ++i) {
+		auto newBlock = GetWorld()->SpawnActorDeferred<ABPO_Block>(BlockVisualClass, FTransform::Identity);
+		auto model = blocks[i];
+		newBlock->SetModel(model, CellSize, BlockSize, Game->grid()->dim());
+		newBlock->FinishSpawning(FTransform::Identity);
+		BlocksVisual.Add(newBlock);
 	}
 }
 

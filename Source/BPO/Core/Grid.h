@@ -19,7 +19,7 @@ class Block;
 		void update(const TArray<TSharedPtr<Block>> blocks, CellType cellType);
 		void update(const Position& pos, CellType cellType);
 		bool hitTest(const Position& pos, CellType cellType) const;
-		HitResult hitResult(const Position& pos) const;
+		//HitResult hitResult(const Position& pos) const;
 		CellType hitCellType(const Position& pos) const;
 		FUintRect getFreeSpace() const { return freeSpace; }
 		void printDebug();

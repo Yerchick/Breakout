@@ -52,7 +52,7 @@ private:
 	bool m_gameOver = false;
 	bool m_gridChanged = false;
 
-	bool died() const;
+	void gameOver();
 	void generateBlocks(FUintRect freeGamingSpace);
 
 };

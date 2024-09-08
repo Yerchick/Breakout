@@ -26,12 +26,12 @@ enum class CellType
 	Error = 8
 };
 
-enum class HitResult
-{
-	NoHit = 0,
-	Changes = 1,
-	Fault = 2
-};
+//enum class HitResult
+//{
+//	NoHit = 0,
+//	Changes = 1,
+//	Fault = 2
+//};
 
 enum class Dirrection
 {
@@ -41,15 +41,17 @@ enum class Dirrection
 	Down = 3
 };
 
-inline const TCHAR* ToString(Breakout::HitResult Type)
+inline const TCHAR* ToString(Breakout::Dirrection dir)
 {
-	switch (Type) {
-		case HitResult::NoHit:
-			return TEXT("Success");
-		case HitResult::Changes:
-			return TEXT("Changes");
-		case HitResult::Fault:
-			return TEXT("Fault");
+	switch (dir) {
+		case Dirrection::Right:
+			return TEXT("Right");
+		case Dirrection::Left:
+			return TEXT("Left");
+		case Dirrection::Up:
+			return TEXT("Up");
+		case Dirrection::Down:
+			return TEXT("Down");
 		default:
 
 			return TEXT("Unknown");
@@ -149,11 +151,13 @@ struct Input
 
 struct IntersectionResult
 {
-	HitResult result{ HitResult::Fault };
+//	HitResult result{ HitResult::Fault };
+	FVector2D ballPoint{ 0,0 };
+	FVector2D hitPoint{ 0,0 };
 	Position pos{ 0,0 };
 	CellType type{CellType::Error};
 	Dirrection dirr{ Dirrection::Right };
-
+	FVector2D dir{0,0};
 };
 
 using TPositionList = TDoubleLinkedList<Position>;

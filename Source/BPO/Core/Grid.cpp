@@ -143,9 +143,9 @@ bool Grid::hitTest(const Position& pos, CellType cellType) const
 	int32 index = posToIndex(pos);
 	if (index >= m_cells.Num() || !m_cells.IsValidIndex(index)) {
 		//UE_LOG(LogGrid, Error, TEXT("HitTest Triest to use wron index: %d, %d for cell type: %s"), pos.x, pos.y, ToString(cellType));
-		return true;
+		return false;
 	}
-	//UE_LOG(LogGrid, Display, TEXT("hit Test: %d, %d with cell type: %s"), pos.x, pos.y, ToString(m_cells[posToIndex(pos)]));
+	UE_LOG(LogGrid, Display, TEXT("hit Test: %d, %d with cell type: %s"), pos.x, pos.y, ToString(m_cells[posToIndex(pos)]));
 	return m_cells[posToIndex(pos)] == cellType;
 }
 
@@ -160,26 +160,26 @@ CellType Grid::hitCellType(const Position& pos) const
 	return m_cells[posToIndex(pos)];
 }
 
-HitResult Grid::hitResult(const Position& pos) const
-{
-	int32 index = posToIndex(pos);
-	if (index >= m_cells.Num() || !m_cells.IsValidIndex(index)) {
-		return HitResult::Fault;
-	} else {
-		switch (m_cells[index]) {
-			case CellType::Wall: return HitResult::Changes;
-			case CellType::PaddleZone: return HitResult::NoHit;
-			case CellType::DeadZone: return HitResult::Fault;
-			case CellType::Paddle:  return HitResult::Changes;
-			case CellType::Block:  return HitResult::Changes;
-			case CellType::SuperBlock:  return HitResult::Changes;
-			case CellType::Ball: return HitResult::Changes;
-			default:
-			case CellType::Empty: return HitResult::NoHit;
-				break;
-		}
-	}
-}
+//HitResult Grid::hitResult(const Position& pos) const
+//{
+//	int32 index = posToIndex(pos);
+//	if (index >= m_cells.Num() || !m_cells.IsValidIndex(index)) {
+//		return HitResult::Fault;
+//	} else {
+//		switch (m_cells[index]) {
+//			case CellType::Wall: return HitResult::Changes;
+//			case CellType::PaddleZone: return HitResult::NoHit;
+//			case CellType::DeadZone: return HitResult::Fault;
+//			case CellType::Paddle:  return HitResult::Changes;
+//			case CellType::Block:  return HitResult::Changes;
+//			case CellType::SuperBlock:  return HitResult::Changes;
+//			case CellType::Ball: return HitResult::Changes;
+//			default:
+//			case CellType::Empty: return HitResult::NoHit;
+//				break;
+//		}
+//	}
+//}
 
 
 

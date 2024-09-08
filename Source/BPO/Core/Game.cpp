@@ -28,7 +28,7 @@ void Game::generateBlocks(FUintRect freeGamingSpace)
 	m_blocks.Empty();
 	for (uint32 y = freeGamingSpace.Min.Y; y <= freeGamingSpace.Max.Y * 0.7; ++y) {
 		for (uint32 x = freeGamingSpace.Min.X; x <= freeGamingSpace.Max.X; ++x) {
-			if (FMath::RandRange(0, 100) > 70) {
+			if (FMath::RandRange(0, 100) > 99) {
 				auto block = MakeShared<Block>();
 				block.Get().setPossitions(TArray<Position>{ {x, y}});
 				m_blocks.Add(block);
@@ -85,138 +85,61 @@ void Game::moveBall(const float deltaSeconds, const float ballSpeed)
 	Position potentialNewPos{ 0,0 };
 	FVector2D deltaSummary = m_ball->deltaAccurate() + delta;
 
-	newPos = oldAccuratePos + m_ball->deltaAccurate() + delta;
+	newPos = m_ball->positionAccurate() + m_ball->deltaAccurate() + delta;
 	potentialNewPos = m_ball->getRoundedPosition(newPos);
 
-	float ballRadius = c_settings.grid.cellSize/2; 
+	float ballRadius = c_settings.grid.cellSize / 2;
 
-	auto points = getAllIntersectingResults(newPos, ballRadius);
+	auto points = getAllIntersectingResults(newPos, 0.5);
 	if (!points.IsEmpty()) {
 		auto intersectionResult = getNearestIntersectionResult(newPos, points);
 		UpdateDirrectionAfterHit(intersectionResult, m_ballDirrection);
 	}
-
-	
-
-	
-	//auto points = getAllIntersectingPositions(newPos, ballRadius, CellType::Wall);
-	//if (!points.IsEmpty()) {
-	//	potentialNewPos = getNearestIntersectionPoint(newPos, points);
-	//	m_ballDirrection = getDirrectionAfterHit(newPos, oldAccuratePos, m_ballDirrection);
-	//}
-
-
-
-
-	/*if ((deltaSummary).Length() >= 1) {
-		FVector2D tempDirrection = m_ballDirrection;
-		FVector2D tempOldPos = oldAccuratePos;
-		FVector2D tempdelta = delta;
-		for (int i = 0; i < deltaSummary.Length(); ++i) {
-			auto pos = tempOldPos + i / deltaSummary.Length() * tempdelta;
-			UE_LOG(LogGame, Display, TEXT("moveBall. Scaning at index: %d"), i);
-			tempDirrection = getDirrectionAfterHit(pos, tempOldPos, tempDirrection);
-			tempOldPos = pos;
-			tempdelta = tempDirrection * deltaSeconds * ballSpeed * m_gameSpeed;
-			continue;
-		}
-		oldAccuratePos = tempOldPos;
-		m_ballDirrection = tempDirrection;
-
-		delta = (m_ballDirrection * deltaSeconds * ballSpeed * m_gameSpeed);
-	} else {
-		UE_LOG(LogGame, Display, TEXT("moveBall. Scaning normaly"));
-		m_ballDirrection = getDirrectionAfterHit(newPos, oldAccuratePos, m_ballDirrection);
-	}*/
 	m_ball->move(potentialNewPos, newPos);
 }
 
 TArray<Breakout::IntersectionResult> Game::getAllIntersectingResults(FVector2D atPoint, float radius)
 {
 	TArray<Breakout::IntersectionResult> results;
-	FVector2D intersectionPoint = atPoint;
-	for (int i = 0; i < 4; ++i) {
+	TArray<FVector2D> ballBorders;
+	//FVector2D intersectionPoint = atPoint;
+
+	if (m_ballDirrection.Y > 0) {
+		ballBorders.Add(atPoint + FVector2D(0, radius));
+	} else {
+		ballBorders.Add(atPoint + FVector2D(0, -radius));
+	}
+	if (m_ballDirrection.X > 0) {
+
+		ballBorders.Add(atPoint + FVector2D(radius, 0));
+		//UE_LOG(LogGame, Display, TEXT("To: %s adding: %s. Result: %s"), *atPoint.ToString(), *FVector2D(radius, 0).ToString(), *(atPoint + FVector2D(radius, 0)).ToString());
+	} else {
+		ballBorders.Add(atPoint + FVector2D(-radius, 0));
+	}
+
+	for (FVector2D border : ballBorders) {
 		Breakout::IntersectionResult result;
-		result.result = HitResult::NoHit;
+		result.ballPoint = atPoint;
+		//result.dirr = border.Key;
+		//result.result = HitResult::NoHit;
 		CellType type = CellType::Empty;
-		switch (i) {
-			case 0:
-				result.dirr = Dirrection::Up;
-				intersectionPoint += FVector2D(0, radius);
-				break;
-			case 1:
-				result.dirr = Dirrection::Down;
-				intersectionPoint += FVector2D(0, -radius);
-				break;
-			case 2:
-				result.dirr = Dirrection::Right;
-				intersectionPoint += FVector2D(radius, 0);
-				break;
-			case 3:
-				result.dirr = Dirrection::Left;
-				intersectionPoint += FVector2D(-radius, 0);
-				break;
+		result.pos = m_ball->getRoundedPosition(border);
+		result.hitPoint = border;
+		result.type = m_grid->hitCellType(result.pos);
+		if (result.type != CellType::Empty && result.type != CellType::PaddleZone /*&& result.type != CellType::Ball*/) {
+			UE_LOG(LogGame, Display, TEXT("Adding intersection result with pos: %s, at point: %s = %d, %d,  with: %s, at: %s"),
+				*atPoint.ToString(), *border.ToString(), result.pos.x, result.pos.y, ToString(result.type), ToString(result.dirr));
+			results.Add(result);
 		}
-		Breakout::Position pos = m_ball->getRoundedPosition(intersectionPoint);
-	
-		if (!m_grid->hitTest(pos, CellType::Wall)) {
-			result.type = CellType::Wall;
-			result.result = HitResult::Changes;
-		}
-		if (!m_grid->hitTest(pos, CellType::Block)) {
-			result.type = CellType::Block;
-			result.result = HitResult::Changes;
-		}
-		if (!m_grid->hitTest(pos, CellType::Paddle)) {
-			result.type = CellType::Paddle;
-			result.result = HitResult::Changes;
-		}
-		if (!m_grid->hitTest(pos, CellType::DeadZone)) {
-			result.type = CellType::DeadZone;
-			result.result = HitResult::Fault;
-		}
-		results.Add(result);
 	}
 	return results;
 }
 
-//TArray<Breakout::Position> Game::getAllIntersectingPositions(FVector2D atPoint, float radius, CellType cellType)
-//{
-//	TArray<Breakout::Position> result;
-//	FVector2D intersectionPoint = atPoint;
-//	for (int i = 0; i < 4; ++i) {
-//		switch (i) {
-//			case 0:
-//				intersectionPoint += FVector2D(0, radius);
-//				break;
-//			case 1:
-//				intersectionPoint += FVector2D(0, -radius);
-//				break;
-//			case 2:
-//				intersectionPoint += FVector2D(radius, 0);
-//				break;
-//			case 3:
-//				intersectionPoint += FVector2D(-radius, 0);
-//				break;
-//		}
-//		Breakout::Position pos = m_ball->getRoundedPosition(intersectionPoint);
-//		if (!m_grid->hitTest(pos, CellType::Wall)) {
-//			result.Add(pos);
-//		}
-//		if (!m_grid->hitTest(pos, CellType::Block)) {
-//			result.Add(pos);
-//		}
-//		if (!m_grid->hitTest(pos, CellType::Paddle)) {
-//			result.Add(pos);
-//		}
-//	}
-//	return result;
-//}
-
 Breakout::IntersectionResult Game::getNearestIntersectionResult(FVector2D atPoint, TArray<Breakout::IntersectionResult> results)
 {
 	IntersectionResult result;
-	result.result = HitResult::NoHit;
+	result.type = CellType::Empty;
+	//result.result = HitResult::NoHit;
 	if (results.Num() < 0) return result;
 	double halfCellSize = c_settings.grid.cellSize / 2;
 
@@ -226,54 +149,73 @@ Breakout::IntersectionResult Game::getNearestIntersectionResult(FVector2D atPoin
 		auto res = results[i];
 		auto pos = res.pos;
 		FBox2D box = FBox2D(FVector2D(pos.x, pos.y) - halfCellSize, FVector2D(pos.x, pos.y) + halfCellSize);
-		double distance = FVector2D::Distance(atPoint, box.GetClosestPointTo(atPoint));
-		if (nearestDistance == -1 || nearestDistance > distance) {
-			nearestDistance = distance;
+		const FVector2D closestCellsPoint = box.GetClosestPointTo(atPoint);
+		double distance = FVector2D::Distance(atPoint, closestCellsPoint);
+		const float ballRadius = 0.5f;
+		if ((nearestDistance == -1 || nearestDistance > distance) && distance<= ballRadius) {
 			result = res;
+			//UE_LOG(LogGame, Display, TEXT("getNearestIntersectionResult dirrection: %s, %f, %f"), ToString(result.dirr), xDis, yDis);
 		}
 	}
+	
 	return result;
 }
 
-//Breakout::Position Game::getNearestIntersectionPoint(FVector2D atPoint, TArray<Breakout::Position> positions)
-//{
-//	if (positions.Num() < 0) return Position{ 0,0 };
-//	double nearestDistance = -1;
-//	Position nearestPoint = Position{ 0,0 };
-//	double halfCellSize = c_settings.grid.cellSize / 2;
-//	for (int i = 0; i < positions.Num(); ++i) {
-//		auto pos = positions[i];
-//		FBox2D box = FBox2D(FVector2D(pos.x, pos.y) - halfCellSize, FVector2D(pos.x, pos.y) + halfCellSize);
-//		double distance = FVector2D::Distance(atPoint, box.GetClosestPointTo(atPoint));
-//		if (nearestDistance == -1 || nearestDistance > distance) {
-//			nearestDistance = distance;
-//			nearestPoint = pos;
-//		}
-//	}
-//	return nearestPoint;
-//}
-
 void Game::UpdateDirrectionAfterHit(Breakout::IntersectionResult hit, FVector2D& dirrection)
 {
-	if (hit.result == HitResult::Changes) {
-		FVector2D dirrectionMultiplier;
-		if (hit.dirr == Dirrection::Up || hit.dirr == Dirrection::Down) {
-			dirrection *= FVector2D(1, -1);
-		} else if (hit.dirr == Dirrection::Right || hit.dirr == Dirrection::Left) {
-			dirrection *= FVector2D(-1, 1);
-		}
-		if (hit.type == CellType::Paddle) {
-			const auto& Links = m_paddle.Get()->links();
-			uint32 index = 0;
+	if (hit.type == CellType::DeadZone) {
+		gameOver();
+	}
 
-			for (const auto& Link : Links) {
-				if (Link.x == (int32)(hit.pos.x + 0.5)) {
-					dirrection += FVector2D(((index / (float)Links.Num()) - 0.5f) * -2, 0); 
-				}
-				++index;
+	if (hit.type == CellType::Paddle) {
+		const auto& Links = m_paddle.Get()->links();
+		uint32 index = 0;
+
+		for (const auto& Link : Links) {
+			if (Link.x == (int32)(hit.pos.x + 0.5)) {
+				float xDir = ((index / (float)Links.Num()) - 0.5f) * -2;
+				const bool negative = xDir < 0;
+				//const float absX = FMath::Clamp(FMath::Abs(xDir), 0.5, 1);
+				dirrection = FVector2D(FMath::Clamp(xDir, -1, 1), -(FMath::Abs(dirrection.Y)));
+				UE_LOG(LogGame, Display, TEXT("UpdateDirrectionAfterHit paddle: %s"), *dirrection.ToString());
+				break;
 			}
+			++index;
 		}
 	}
+
+	if (hit.type == CellType::Block || hit.type == CellType::SuperBlock || hit.type == CellType::Wall) {
+		FVector2D dirrectionMultiplier;
+		if (hit.type == CellType::Block || hit.type == CellType::SuperBlock) {
+			onBlockHit(hit .pos);
+		}
+		const double xDiff = FMath::Abs(hit.hitPoint.X) - FMath::Abs(hit.ballPoint.X);
+		const double xDiffAbs = FMath::Abs(xDiff);
+		const double yDiff = FMath::Abs(hit.hitPoint.Y) - FMath::Abs(hit.ballPoint.Y);
+		const double yDiffAbs = FMath::Abs(yDiff);
+
+		if (xDiffAbs < yDiffAbs) {
+			dirrection *= FVector2D(1, -1);
+			UE_LOG(LogGame, Display, TEXT("UpdateVerticalDirrectionAfterHit: %f, %f, dirr: %s, with: %s, hit pos: %d, %d, ball: %s"), xDiffAbs, yDiffAbs, *dirrection.ToString(), ToString(hit.type), hit.pos.x, hit.pos.y, *hit.ballPoint.ToString());
+			//return;
+		} else {
+			dirrection *= FVector2D(-1, 1);
+			UE_LOG(LogGame, Display, TEXT("UpdateHorizontalDirrectionAfterHit: %f, %f, dirr: %s, with %s, hit pos: %d, %d, ball: %s"), xDiffAbs, yDiffAbs, *dirrection.ToString(), ToString(hit.type), hit.pos.x, hit.pos.y, *hit.ballPoint.ToString());
+			//return;
+		}
+
+	/*	if (hit.dirr == Dirrection::Up || hit.dirr == Dirrection::Down) {
+			dirrection *= FVector2D(1, -1);
+			UE_LOG(LogGame, Display, TEXT("UpdateVerticalDirrectionAfterHit up or down: %s, with: %s, at pos: %d, %d, ball: %s"), *dirrection.ToString(), ToString(hit.type),  *hit.ballPoint.ToString());
+			return;
+		} else if (hit.dirr == Dirrection::Right || hit.dirr == Dirrection::Left) {
+			dirrection *= FVector2D(-1, 1);
+			UE_LOG(LogGame, Display, TEXT("UpdateHorizontalDirrectionAfterHit left or right: %s, with %s, at pos: %d, %d, ball: %s"), *dirrection.ToString(), ToString(hit.type), *hit.ballPoint.ToString());
+			return;
+		}*/
+	}
+	
+
 }
 
 //FVector2D Game::getDirrectionAfterHit(FVector2D pos, FVector2D oldPos, FVector2D dirrection)
@@ -377,7 +319,7 @@ void Game::updateGrid()
 	if (!m_gridChanged) return;
 	//UE_LOG(LogGame, Display, TEXT("UpdateGrid with a paddle: %d, %d"), m_paddle->tail().x, m_paddle->head().x);
 	m_grid->update(m_paddle->body(), CellType::Paddle, true);
-	m_grid->update(m_ball->body(), CellType::Ball, true);
+	//m_grid->update(m_ball->body(), CellType::Ball, true);
 	m_grid->update(m_blocks, CellType::Block);
 	m_grid->printDebug();
 	m_gridChanged = false;
@@ -391,9 +333,8 @@ bool Game::isTimeToUpdate(float deltaSeconds)
 	return true;
 }
 
-bool Breakout::Game::died() const
+void Game::gameOver()
 {
-	//UE_LOG(LogGame, Display, TEXT("Check to die: %d, %d"), m_ball->body()->GetValue().x, m_ball->body()->GetValue().y);
-	//return m_grid->hitTest(m_ball->body()->GetValue(), CellType::DeadZone);
-	return false;
+	UE_LOG(LogGame, Display, TEXT("----------------GameOver!-------------------"));
+	m_gameOver = true;
 }
