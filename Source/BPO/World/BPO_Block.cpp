@@ -73,7 +73,7 @@ void ABPO_Block::Tick(float DeltaTime)
 	const auto& Links = Block.Pin()->positions();
 	const auto Pos = Links[0];
 
-	const FTransform Transform = FTransform(LinkPositionToVector(Pos, CellSize, Dims));
+	const FTransform Transform = FTransform(Breakout::LinkPositionToVector(Pos, CellSize, Dims));
 	SetActorLocation(Transform.GetLocation());
 }
 

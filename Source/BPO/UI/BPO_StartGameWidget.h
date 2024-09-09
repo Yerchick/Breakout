@@ -24,6 +24,9 @@ protected:
 	TObjectPtr<UButton> StartGameButton;
 
 	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<UButton> ExitButton;
+
+	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UButton> OkButton;
 
 	UPROPERTY(meta = (BindWidget))
@@ -41,4 +44,6 @@ private:
 	UFUNCTION()
 	void  ShowAnimaFact();
 
+	UFUNCTION()
+	void OnExitGame();
 };

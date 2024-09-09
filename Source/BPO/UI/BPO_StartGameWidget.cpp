@@ -19,12 +19,20 @@ void UBPO_StartGameWidget::NativeOnInitialized()
 	check(OkButton);
 	OkButton->OnClicked.AddDynamic(this, &ThisClass::OnStartGame);
 
+	check(ExitButton);
+	ExitButton->OnClicked.AddDynamic(this, &ThisClass::OnExitGame);
+
 	WidgetSwitcher.Get()->SetActiveWidgetIndex(0);
 }
 
 void  UBPO_StartGameWidget::ShowAnimaFact()
 {
 	WidgetSwitcher.Get()->SetActiveWidgetIndex(1);
+}
+
+void UBPO_StartGameWidget::OnExitGame()
+{
+	GetWorld()->GetFirstPlayerController()->ConsoleCommand("quit");
 }
 
 void UBPO_StartGameWidget::OnStartGame()
