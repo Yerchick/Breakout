@@ -20,14 +20,15 @@ public:
 
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 
-	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FFactAboutAnimalRequestCompleteDelegate, bool, Succeeded);
-	UPROPERTY(BlueprintAssignable, Category = "Fact");
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FFactAboutAnimalRequestCompleteDelegate, FString, fact);
+	UPROPERTY(BlueprintAssignable, Category = "API");
 	FFactAboutAnimalRequestCompleteDelegate AnimalFactRequestComplete;
 	UFUNCTION(BlueprintCallable)
-	void GetAnimalFactRequest();
-	void GetAnimalFactResponse(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);
+	void RequestAnimalFact();
+	void OnAnimalFactResponse(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);
 
 private:
 
+	TArray<TSharedPtr<FJsonValue>> TryGetJson(FString jsonString);
 	FHttpModule* Http;
 };

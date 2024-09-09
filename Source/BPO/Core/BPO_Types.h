@@ -13,17 +13,22 @@ struct Dim
 	uint32 height;
 };
 
+enum class BlockType
+{
+	Normal = 0,
+	Super
+};
+
 enum class CellType
 {
 	Empty = 0,
-	Wall = 1,
-	Block = 2,
-	SuperBlock = 3,
-	PaddleZone = 4,
-	Paddle = 5,
-	DeadZone = 6,
-	Ball = 7,
-	Error = 8
+	Wall,
+	Block,
+	PaddleZone,
+	Paddle,
+	DeadZone,
+	Ball,
+	Error
 };
 
 enum class Dirrection
@@ -70,8 +75,6 @@ inline const TCHAR* ToString(Breakout::CellType Type)
 			return TEXT("Wall");
 		case CellType::Block:
 			return TEXT("Block");
-		case CellType::SuperBlock:
-			return TEXT("SuperBlock");
 		case CellType::PaddleZone:
 			return TEXT("PaddleZone");
 		case CellType::Paddle:

@@ -3,3 +3,10 @@
 
 #include "Framework/BPO_MenuGameMode.h"
 
+
+void ABPO_MenuGameMode::BeginPlay()
+{
+	Super::BeginPlay();
+
+
+}

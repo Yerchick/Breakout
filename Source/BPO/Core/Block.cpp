@@ -9,3 +9,8 @@ void Breakout::Block::setPossitions(const TArray<Breakout::Position>& positions)
 {
 	m_positions = positions;
 }
+
+void Breakout::Block::setType(BlockType inType)
+{
+	m_type = inType;
+}

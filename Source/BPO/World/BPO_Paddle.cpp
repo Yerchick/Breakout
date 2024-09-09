@@ -56,7 +56,7 @@ void ABPO_Paddle::Tick(float DeltaTime)
 	auto* LinkPtr = Links.GetHead();
 
 	for (auto* LinkActor : PaddleLinks) {
-		LinkActor->SetActorLocation(LinkPositionToVector(LinkPtr->GetValue(), CellSize, Dims));
+		LinkActor->SetActorLocation(Breakout::LinkPositionToVector(LinkPtr->GetValue(), CellSize, Dims));
 		LinkPtr = LinkPtr->GetNextNode();
 	}
 }

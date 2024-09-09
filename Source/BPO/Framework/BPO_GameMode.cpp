@@ -28,6 +28,9 @@ ABPO_GameMode::ABPO_GameMode()
 void ABPO_GameMode::StartPlay()
 {
 	Super::StartPlay();
+	
+	check(SuperBlockVisualClass);
+	check(BlockVisualClass);
 
 	// ini core game
 	Game = MakeShared<Breakout::Game>(MakeSettings());
@@ -134,8 +137,11 @@ void ABPO_GameMode::InitWorldBlocks()
 	//init world blocks
 	auto blocks = Game->blocks();
 	for (int i = 0; i < blocks.Num(); ++i) {
-		auto newBlock = GetWorld()->SpawnActorDeferred<ABPO_Block>(BlockVisualClass, FTransform::Identity);
 		auto model = blocks[i];
+		BlockType type = model.Get()->type();
+		TSubclassOf<ABPO_Block> blockClass = type == BlockType::Super ? SuperBlockVisualClass : BlockVisualClass;
+		auto newBlock = GetWorld()->SpawnActorDeferred<ABPO_Block>(blockClass, FTransform::Identity);
+		
 		newBlock->SetModel(model, CellSize, BlockSize, Game->grid()->dim());
 		newBlock->FinishSpawning(FTransform::Identity);
 		BlocksVisual.Add(newBlock);

@@ -8,7 +8,8 @@ public class BPO : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 	
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput","HTTP"});
+		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput","HTTP", "Json",
+            "JsonUtilities"});
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
 

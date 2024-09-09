@@ -36,6 +36,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Paddle Settings")
 	TSubclassOf<ABPO_Block> BlockVisualClass;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Paddle Settings")
+	TSubclassOf<ABPO_Block> SuperBlockVisualClass;
+
 	UPROPERTY(EditDefaultsOnly, meta = (ClampMin = "5", ClampMax = "200"), Category = "Grid Settings")
 	FUintPoint GridSize{ 30, 50 };
 

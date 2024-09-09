@@ -28,12 +28,16 @@ void Game::generateBlocks(FUintRect freeGamingSpace)
 	m_blocks.Empty();
 	for (uint32 y = freeGamingSpace.Min.Y; y <= freeGamingSpace.Max.Y * 0.7; ++y) {
 		for (uint32 x = freeGamingSpace.Min.X; x <= freeGamingSpace.Max.X; ++x) {
-			if (FMath::RandRange(0, 100) > 99) {
+			if (FMath::RandRange(0, 100) > 90) {
 				auto block = MakeShared<Block>();
 				block.Get().setPossitions(TArray<Position>{ {x, y}});
+				if (FMath::RandRange(0, 100) > 90) {
+					block.Get().setType(BlockType::Super);
+				} else {
+					block.Get().setType(BlockType::Normal);
+				}
 				m_blocks.Add(block);
 			}
-
 		}
 	}
 	m_grid->update(m_blocks, CellType::Block);
@@ -182,9 +186,9 @@ void Game::UpdateDirrectionAfterHit(Breakout::IntersectionResult hit, FVector2D&
 		}
 	}
 
-	if (hit.type == CellType::Block || hit.type == CellType::SuperBlock || hit.type == CellType::Wall) {
+	if (hit.type == CellType::Block || hit.type == CellType::Wall) {
 		FVector2D dirrectionMultiplier;
-		if (hit.type == CellType::Block || hit.type == CellType::SuperBlock) {
+		if (hit.type == CellType::Block) {
 			onBlockHit(hit .pos);
 		}
 		const double xDiff = FMath::Abs(hit.hitPoint.X) - FMath::Abs(hit.ballPoint.X);
@@ -292,22 +296,24 @@ void Game::onBlockHit(const Position& pos, bool superBlock)
 		}
 	}
 	if (blockIndex != -1 && blockPtr.IsValid()) {
-		blockPtr.Reset();
-		m_blocks.RemoveAt(blockIndex);
+		auto blocksNum = m_blocks.Num();
 		m_grid->update(pos, CellType::Empty);
 		//Add points for player
 		m_gridChanged = true;
-		if (superBlock) {
+		
+		if (blockPtr.Get()->type() == BlockType::Super) {
 			m_score += 10;
 			dispatchEvent(GameplayEvent::SuperBlockBroken);
 		} else {
 			++m_score;
 			dispatchEvent(GameplayEvent::BlockBroken);
 		}
-		if (m_blocks.IsEmpty()) {
+		if (blocksNum == 1) {
 			m_gameOver = true;
 			dispatchEvent(GameplayEvent::GameCompleted);
 		}
+		blockPtr.Reset();
+		m_blocks.RemoveAt(blockIndex);
 	}
 }
 

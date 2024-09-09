@@ -11,4 +11,8 @@ class BPO_API ABPO_MenuGameMode : public AGameModeBase
 {
 	GENERATED_BODY()
 	
+protected:
+
+	virtual void BeginPlay() override;
+
 };

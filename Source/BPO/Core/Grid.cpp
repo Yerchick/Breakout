@@ -72,7 +72,6 @@ void Grid::printDebug()
 				case CellType::Paddle: symbol = '='; break;
 				case CellType::Ball: symbol = 'o'; break;
 				case CellType::Block: symbol = 'b'; break;
-				case CellType::SuperBlock: symbol = 's'; break;
 				default:
 				case CellType::Empty: symbol = ' '; break;
 					break;

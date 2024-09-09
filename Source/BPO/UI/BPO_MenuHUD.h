@@ -25,4 +25,7 @@ private:
 	UPROPERTY()
 	TObjectPtr<UBPO_StartGameWidget> StartGameWidget;
 
+	UFUNCTION()
+	void OnFactReceived(FString fact);
+
 };
