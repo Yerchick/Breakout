@@ -4,7 +4,7 @@
 #include "World/BPO_Paddle.h"
 #include "World/BPO_PaddleLink.h"
 
-namespace
+namespace Breakout
 {
 FVector LinkPositionToVector(const Breakout::Position& Position, FUintPoint CellSize, const Breakout::Dim& Dims)
 {
@@ -37,7 +37,7 @@ void ABPO_Paddle::BeginPlay()
 
 	uint32 i = 0;
 	for (const auto& Link : Links) {
-		const FTransform Transform = FTransform(LinkPositionToVector(Link, CellSize, Dims));
+		const FTransform Transform = FTransform(Breakout::LinkPositionToVector(Link, CellSize, Dims));
 		auto* LinkActor = GetWorld()->SpawnActorDeferred<ABPO_PaddleLink>(PaddleClass, Transform);
 		LinkActor->UpdateScale(CellSize, PaddleSize);
 		LinkActor->FinishSpawning(Transform);

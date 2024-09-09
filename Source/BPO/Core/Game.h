@@ -24,6 +24,10 @@ public:
 	void update(float deltaSeconds, const Input& input);
 	void updateGameSpeed(float newSpeed);
 
+	uint32 score() const { return m_score; }
+
+	void subscribeOnGameplayEvent(GameplayEventCallback callback);
+
 private:
 	const Settings c_settings;
 	TSharedPtr<Grid> m_grid;
@@ -31,11 +35,14 @@ private:
 	TSharedPtr<Ball> m_ball;
 	TArray<TSharedPtr<Block>> m_blocks;
 
+	TArray<GameplayEventCallback> m_gameplayEventCallbacks;
+	void dispatchEvent(GameplayEvent Event);
+
 	void movePaddle(const Input& input);
 	bool canPaddleMove(const Input& input);
 	void moveBall(const float deltaSeconds, const float ballSpeed);
 	void updateGrid();
-	void onBlockHit(const Position& pos);
+	void onBlockHit(const Position& pos, bool superBlock = false);
 	//TArray<Breakout::Position> getAllIntersectingPositions(FVector2D atPoint, float radius, CellType cellType);
 	//Breakout::Position getNearestIntersectionPoint(FVector2D atPoint, TArray<Breakout::Position> positions);
 	TArray<Breakout::IntersectionResult> getAllIntersectingResults(FVector2D atPoint, float radius);
@@ -51,6 +58,7 @@ private:
 	bool isTimeToUpdate(float deltaSeconds);
 	bool m_gameOver = false;
 	bool m_gridChanged = false;
+	uint32 m_score{ 0 };
 
 	void gameOver();
 	void generateBlocks(FUintRect freeGamingSpace);

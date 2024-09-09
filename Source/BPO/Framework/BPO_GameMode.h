@@ -13,6 +13,7 @@ class ABPO_Grid;
 class ABPO_Paddle;
 class ABPO_Ball;
 class ABPO_Block;
+class ABPO_HUD;
 class UInputAction;
 class UInputMappingContext;
 
@@ -90,26 +91,31 @@ protected:
 	TObjectPtr <UInputMappingContext> InputGameMapping;
 
 private:
-	TUniquePtr<Breakout::Game> Game;
+	TSharedPtr<Breakout::Game> Game;
 	Breakout::Input PaddleInput{ 0 };
 
 	UPROPERTY()
-	ABPO_Grid* GridVisual;
+	TObjectPtr<ABPO_Grid> GridVisual;
 
 	UPROPERTY()
-	ABPO_Paddle* PaddleVisual;
+	TObjectPtr < ABPO_Paddle> PaddleVisual;
 
 	UPROPERTY()
-	ABPO_Ball* BallVisual;
+	TObjectPtr < ABPO_Ball> BallVisual;
 
 	UPROPERTY()
 	TArray<ABPO_Block*> BlocksVisual;
 
+	UPROPERTY()
+	TObjectPtr<ABPO_HUD> BPO_HUD;
+
 	void SetupInput();
 	void InitWorldBlocks();
+	void OnPointsAdded();
 	void OnMoveRight(const FInputActionValue& Value);
 	void OnSpeedUp(const FInputActionValue& Value);
 	void OnRestart(const FInputActionValue& Value);
 
-	Breakout::Settings MakeSettings();
+	Breakout::Settings MakeSettings() const;
+	void SusbcribeOnGameEvents();
 };

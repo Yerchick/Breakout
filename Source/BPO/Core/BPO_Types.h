@@ -26,13 +26,6 @@ enum class CellType
 	Error = 8
 };
 
-//enum class HitResult
-//{
-//	NoHit = 0,
-//	Changes = 1,
-//	Fault = 2
-//};
-
 enum class Dirrection
 {
 	Right = 0,
@@ -40,6 +33,16 @@ enum class Dirrection
 	Up = 2,
 	Down = 3
 };
+
+enum class GameplayEvent
+{
+	GameOver = 0,
+	GameCompleted,
+	BlockBroken,
+	SuperBlockBroken
+};
+
+using GameplayEventCallback = TFunction<void(GameplayEvent)>;
 
 inline const TCHAR* ToString(Breakout::Dirrection dir)
 {

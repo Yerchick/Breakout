@@ -10,10 +10,15 @@
 #include "World/BPO_Ball.h"
 #include "World/BPO_Block.h"
 #include "Framework/BPO_Pawn.h"
+#include "UI/BPO_HUD.h"
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
 
+
+
 using namespace Breakout;
+
+DEFINE_LOG_CATEGORY_STATIC(LogBPOGameMode, All, All)
 
 ABPO_GameMode::ABPO_GameMode()
 {
@@ -25,7 +30,7 @@ void ABPO_GameMode::StartPlay()
 	Super::StartPlay();
 
 	// ini core game
-	Game = MakeUnique<Breakout::Game>(MakeSettings());
+	Game = MakeShared<Breakout::Game>(MakeSettings());
 	check(Game.IsValid());
 
 	// init world grid
@@ -35,6 +40,8 @@ void ABPO_GameMode::StartPlay()
 	check(GridVisual);
 	GridVisual->SetModel(Game->grid(), CellSize, WallWidth);
 	GridVisual->FinishSpawning(GridOrigin);
+
+	SusbcribeOnGameEvents();
 
 	InitWorldBlocks();
 
@@ -59,6 +66,11 @@ void ABPO_GameMode::StartPlay()
 
 	//
 	SetupInput();
+
+	//
+	BPO_HUD = Cast<ABPO_HUD>(PC->GetHUD());
+	check(BPO_HUD);
+	BPO_HUD->SetModel(Game);
 }
 
 void ABPO_GameMode::Tick(float DeltaSeconds)
@@ -106,12 +118,14 @@ void ABPO_GameMode::OnSpeedUp(const FInputActionValue& Value)
 void ABPO_GameMode::OnRestart(const FInputActionValue& Value)
 {
 	if (const bool inputValue = Value.Get<bool>()) {
-		Game.Reset(new Breakout::Game(MakeSettings()));
+		Game = MakeShared<Breakout::Game>(MakeSettings());
 		check(Game.IsValid());
+		SusbcribeOnGameEvents();
 		GridVisual->SetModel(Game->grid(), CellSize, WallWidth);
 		InitWorldBlocks();
 		PaddleVisual->SetModel(Game->paddle(), CellSize, FUintPoint{ PaddleWidth , PaddleHeight }, Game->grid()->dim());
 		BallVisual->SetModel(Game->ball(), CellSize, Game->grid()->dim());
+		BPO_HUD->SetModel(Game);
 	}
 }
 
@@ -128,7 +142,7 @@ void ABPO_GameMode::InitWorldBlocks()
 	}
 }
 
-Breakout::Settings ABPO_GameMode::MakeSettings()
+Breakout::Settings ABPO_GameMode::MakeSettings() const
 {
 	Breakout::Settings GS;
 	GS.difficulty = Difficulty;
@@ -144,4 +158,26 @@ Breakout::Settings ABPO_GameMode::MakeSettings()
 	GS.paddle.width = PaddleWidth;
 	GS.paddle.startPosition = Breakout::Position{ (GridSize.X+ WallWidth) / 2 + PaddleWidth / 2, GridSize.Y + WallWidth };
 	return GS;
+}
+
+
+void ABPO_GameMode::SusbcribeOnGameEvents()
+{
+	using namespace Breakout;
+
+	Game->subscribeOnGameplayEvent([](GameplayEvent Event)
+		{
+			switch (Event) {
+				case GameplayEvent::GameOver:
+					UE_LOG(LogBPOGameMode, Display, TEXT("----------------Game Over!-------------------"));
+
+					break;
+				case GameplayEvent::GameCompleted:
+					UE_LOG(LogBPOGameMode, Display, TEXT("----------------Game Completed!-------------------"));
+
+					break;
+				default:
+					break;
+			}
+		});
 }

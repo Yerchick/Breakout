@@ -3,7 +3,7 @@
 
 #include "World/BPO_Block.h"
 
-namespace
+namespace Breakout
 {
 FVector LinkPositionToVector(const Breakout::Position Position, FUintPoint CellSize, const Breakout::Dim& Dims)
 {
