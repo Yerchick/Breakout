@@ -38,4 +38,5 @@ private:
 	UPROPERTY()
 	TArray<AActor*> PaddleLinks;
 
+	FVector LinkPositionToVector(const Breakout::Position& Position);
 };

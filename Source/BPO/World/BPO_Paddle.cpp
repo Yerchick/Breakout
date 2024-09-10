@@ -4,13 +4,6 @@
 #include "World/BPO_Paddle.h"
 #include "World/BPO_PaddleLink.h"
 
-namespace Breakout
-{
-FVector LinkPositionToVector(const Breakout::Position& Position, FUintPoint CellSize, const Breakout::Dim& Dims)
-{
-	return FVector({ (Dims.height -1 -(double)Position.y - 1) * (double)CellSize.Y, (double)Position.x * (double)CellSize.Y, 0.0f}) + FVector(CellSize)*0.5f;
-}
-} //namespace
 
 ABPO_Paddle::ABPO_Paddle()
 {
@@ -37,7 +30,7 @@ void ABPO_Paddle::BeginPlay()
 
 	uint32 i = 0;
 	for (const auto& Link : Links) {
-		const FTransform Transform = FTransform(Breakout::LinkPositionToVector(Link, CellSize, Dims));
+		const FTransform Transform = FTransform(LinkPositionToVector(Link));
 		auto* LinkActor = GetWorld()->SpawnActorDeferred<ABPO_PaddleLink>(PaddleClass, Transform);
 		LinkActor->UpdateScale(CellSize, PaddleSize);
 		LinkActor->FinishSpawning(Transform);
@@ -56,8 +49,13 @@ void ABPO_Paddle::Tick(float DeltaTime)
 	auto* LinkPtr = Links.GetHead();
 
 	for (auto* LinkActor : PaddleLinks) {
-		LinkActor->SetActorLocation(Breakout::LinkPositionToVector(LinkPtr->GetValue(), CellSize, Dims));
+		LinkActor->SetActorLocation(LinkPositionToVector(LinkPtr->GetValue()));
 		LinkPtr = LinkPtr->GetNextNode();
 	}
+}
+
+FVector ABPO_Paddle::LinkPositionToVector(const Breakout::Position& Position)
+{
+	return FVector({ (Dims.height - 1 - (double)Position.y - 1) * (double)CellSize, (double)Position.x * (double)CellSize, 0.0f }) + FVector(CellSize) * 0.5f;
 }
 
